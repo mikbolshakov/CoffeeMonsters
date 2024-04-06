@@ -29,3 +29,14 @@
   cursor: pointer;
   font-family: Schoolbell;
 }
+
+@media (max-width: 760px) {
+  .social-paragraph img {
+    height: 50px;
+    margin: 25px 25px 0 25px;
+  }
+
+  .social-paragraph p {
+    font-size: 18px;
+  }
+}

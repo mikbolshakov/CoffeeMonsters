@@ -3,9 +3,10 @@ pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
-contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981 {
+contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
     uint256 private _nextTokenId;
 
     address immutable creatorAddress;
@@ -14,31 +15,49 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981 {
 
     uint256 public constant MAX_TOKENS = 666;
     uint256 public constant MINT_PRICE = 0.00666 ether;
+    uint256 public constant PARTNERS_MINT_PRICE = 0.00333 ether;
 
     constructor(
         address _creator,
         address _developer,
-        address _designer,
-        address _royaltyReceiver,
-        uint96 _feeNumerator
-    ) ERC721("CoffeeMonsters", "CM") {
-        _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
+        address _designer
+    ) ERC721("CoffeeMonsters", "CM") Ownable(_developer) {
         creatorAddress = _creator;
         developerAddress = _developer;
         designerAddress = _designer;
+    }
+
+    function setRoyalty(
+        address _royaltyReceiver,
+        uint96 _feeNumerator
+    ) external onlyOwner {
+        _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
     }
 
     function _baseURI() internal pure override returns (string memory) {
         return "ipfs://qqq/";
     }
 
-    function safeMint(address _to, uint256 _amount) external payable {
+    function safeMint(uint256 _amount) external payable {
         require(totalSupply() + _amount <= MAX_TOKENS, "Max collection limit!");
         require(msg.value >= (MINT_PRICE * _amount), "Tx value below price");
 
         for (uint256 i = 0; i < _amount; i++) {
             uint256 tokenId = _nextTokenId++;
-            _safeMint(_to, tokenId);
+            _safeMint(msg.sender, tokenId);
+        }
+    }
+
+    function safeMintForPartners(uint256 _amount) external payable {
+        require(totalSupply() + _amount <= MAX_TOKENS, "Max collection limit!");
+        require(
+            msg.value >= (PARTNERS_MINT_PRICE * _amount),
+            "Tx value below price"
+        );
+
+        for (uint256 i = 0; i < _amount; i++) {
+            uint256 tokenId = _nextTokenId++;
+            _safeMint(msg.sender, tokenId);
         }
     }
 

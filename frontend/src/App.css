@@ -18,15 +18,17 @@ body {
   right: 5%;
   height: 40px;
   background-color: #3333332e;
-  color: #fff;
-  border: none;
   border-radius: 5px;
-  font-size: 20px;
   cursor: pointer;
-  transition: opacity 0.5s ease;
   transition: background-color 0.7s ease;
 }
 
 .scroll-top-button:hover {
   background-color: #3333337c;
+}
+
+@media (max-width: 760px) {
+  .scroll-top-button {
+    height: 30px;
+  }
 }

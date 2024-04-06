@@ -28,14 +28,9 @@ function App() {
     });
   };
 
-  const smoothScrollTo = (elementId) => {
-    document.querySelector(elementId).scrollIntoView({
-      behavior: 'smooth',
-    });
-  };
   return (
     <div>
-      <div onNavClick={smoothScrollTo} className="section" id="home">
+      <div className="section" id="home">
         <HomeParagraph />
       </div>
       <div className="section" id="about">

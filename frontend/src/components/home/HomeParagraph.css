@@ -31,3 +31,21 @@
   font-size: 28px;
   font-family: Cookies;
 }
+
+@media (max-width: 760px) {
+  .home-logo {
+    margin: 30px;
+    width: 150px;
+  }
+
+  .home-main {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .home-mint-button {
+    width: 200px;
+    font-size: 22px;
+  }
+}

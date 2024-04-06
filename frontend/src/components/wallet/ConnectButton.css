@@ -13,3 +13,9 @@
   font-size: 20px;
   font-family: Schoolbell;
 }
+
+@media (max-width: 760px) {
+  .connect-button {
+    display: none;
+  }
+}

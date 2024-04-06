@@ -4,11 +4,11 @@
   justify-content: center;
   display: flex;
   background-color: white;
-  height: 370px;
 }
 
 .about-text {
   width: 50%;
+  margin: 60px 0;
 }
 
 .about-text h1 {
@@ -20,4 +20,18 @@
   font-size: 25px;
   line-height: 1.9;
   font-family: Schoolbell;
+}
+
+@media (max-width: 760px) {
+  .about-text {
+    width: 70%;
+  }
+  .about-text h1 {
+    font-size: 24px;
+    margin: 50px 0;
+  }
+
+  .about-text p {
+    font-size: 20px;
+  }
 }
