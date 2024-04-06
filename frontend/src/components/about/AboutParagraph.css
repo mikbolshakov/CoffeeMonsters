@@ -1,0 +1,23 @@
+.about-paragraph {
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  background-color: white;
+  height: 370px;
+}
+
+.about-text {
+  width: 50%;
+}
+
+.about-text h1 {
+  font-family: Cookies;
+  color: rgba(105, 171, 167, 1);
+}
+
+.about-text p {
+  font-size: 25px;
+  line-height: 1.9;
+  font-family: Schoolbell;
+}

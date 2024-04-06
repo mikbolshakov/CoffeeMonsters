@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'Cookies';
+  src: url('../src/fonts/Cookies.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Schoolbell';
+  src: url('../src/fonts/Schoolbell-Regular.ttf') format('truetype');
+}
+
+body {
+  background: rgba(105, 171, 167, 1);
+}
+
+.scroll-top-button {
+  position: fixed;
+  bottom: 5%;
+  right: 5%;
+  height: 40px;
+  background-color: #3333332e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+  transition: background-color 0.7s ease;
+}
+
+.scroll-top-button:hover {
+  background-color: #3333337c;
+}
