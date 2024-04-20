@@ -26,26 +26,24 @@ describe('CoffeeMonsters tests', async () => {
 
   it('Deploy contract', async () => {
     const Factory = await ethers.getContractFactory('CoffeeMonsters');
-    const monsters = await Factory.deploy(
-      creator.address,
-      developer.address,
-      designer.address,
-    );
+    const monsters = await Factory.deploy(creator.address, developer.address, designer.address);
+
     expect(monsters.address).to.not.eq(ethers.constants.AddressZero);
     nftContract = monsters as CoffeeMonsters;
   });
 
   it('Set default royalty', async () => {
-    expect(nftContract.setRoyalty(nftContract.address, 1000)).to.be
-      .revertedWithCustomError; // only owner
+    expect(nftContract.setRoyalty(nftContract.address, 1000)).to.be.revertedWithCustomError; // only owner
     await nftContract.connect(developer).setRoyalty(nftContract.address, 1000);
   });
 
   it('Mint some tokens', async () => {
     const amount = 1;
+
     expect(await nftContract.totalSupply()).to.be.eq(0);
     expect(await nftContract.balanceOf(user1.address)).to.be.eq(0);
 
+    // safeMint()
     await nftContract.connect(user1).safeMint(amount, {
       value: ethers.utils.parseEther('0.00666'),
     });
@@ -53,12 +51,14 @@ describe('CoffeeMonsters tests', async () => {
     expect(await nftContract.totalSupply()).to.be.eq(amount);
     expect(await nftContract.balanceOf(user1.address)).to.be.eq(amount);
 
+    // Check: Tx value below price
     await expect(
       nftContract.connect(user1).safeMint(amount, {
         value: ethers.utils.parseEther('0.00665'),
       }),
     ).to.be.revertedWith('Tx value below price');
 
+    // safeMint()
     await nftContract.connect(user1).safeMint(amount, {
       value: ethers.utils.parseEther('0.00834'),
     });
@@ -85,45 +85,26 @@ describe('CoffeeMonsters tests', async () => {
     const developerBalanceAfterWithdraw = ethers.utils.parseEther('0.004995');
     const designerBalanceAfterWithdraw = ethers.utils.parseEther('0.004995');
 
-    const creatorBalanceBefore = await ethers.provider.getBalance(
-      creator.address,
-    );
-    const developerBalanceBefore = await ethers.provider.getBalance(
-      developer.address,
-    );
-    const designerBalanceBefore = await ethers.provider.getBalance(
-      designer.address,
-    );
-    expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(
-      totalContractBalance,
-    );
+    const creatorBalanceBefore = await ethers.provider.getBalance(creator.address);
+    const developerBalanceBefore = await ethers.provider.getBalance(developer.address);
+    const designerBalanceBefore = await ethers.provider.getBalance(designer.address);
+    expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(totalContractBalance);
 
     await nftContract.connect(user1).withdraw();
 
-    await expect(nftContract.connect(user1).withdraw()).to.be.revertedWith(
-      'Zero balance',
-    );
+    await expect(nftContract.connect(user1).withdraw()).to.be.revertedWith('Zero balance');
 
     expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(0);
-    const creatorBalanceAfter = await ethers.provider.getBalance(
-      creator.address,
-    );
-    const developerBalanceAfter = await ethers.provider.getBalance(
-      developer.address,
-    );
-    const designerBalanceAfter = await ethers.provider.getBalance(
-      designer.address,
-    );
+    const creatorBalanceAfter = await ethers.provider.getBalance(creator.address);
+    const developerBalanceAfter = await ethers.provider.getBalance(developer.address);
+    const designerBalanceAfter = await ethers.provider.getBalance(designer.address);
 
-    expect(creatorBalanceAfter.sub(creatorBalanceBefore)).to.be.eq(
-      creatorBalanceAfterWithdraw,
-    );
+    // gap
+    expect(creatorBalanceAfter.sub(creatorBalanceBefore)).to.be.eq(creatorBalanceAfterWithdraw);
     expect(developerBalanceAfter.sub(developerBalanceBefore)).to.be.eq(
       developerBalanceAfterWithdraw,
     );
-    expect(designerBalanceAfter.sub(designerBalanceBefore)).to.be.eq(
-      designerBalanceAfterWithdraw,
-    );
+    expect(designerBalanceAfter.sub(designerBalanceBefore)).to.be.eq(designerBalanceAfterWithdraw);
 
     expect(
       creatorBalanceAfterWithdraw
@@ -166,48 +147,27 @@ describe('CoffeeMonsters tests', async () => {
 
   it('Withdraw Eth from the contract', async () => {
     const totalContractBalance = ethers.utils.parseEther('3.9976526922');
-    const creatorBalanceAfterWithdraw =
-      ethers.utils.parseEther('1.3352159991948');
-    const developerBalanceAfterWithdraw =
-      ethers.utils.parseEther('1.3312183465026');
-    const designerBalanceAfterWithdraw =
-      ethers.utils.parseEther('1.3312183465026');
+    const creatorBalanceAfterWithdraw = ethers.utils.parseEther('1.3352159991948');
+    const developerBalanceAfterWithdraw = ethers.utils.parseEther('1.3312183465026');
+    const designerBalanceAfterWithdraw = ethers.utils.parseEther('1.3312183465026');
 
-    const creatorBalanceBefore = await ethers.provider.getBalance(
-      creator.address,
-    );
-    const developerBalanceBefore = await ethers.provider.getBalance(
-      developer.address,
-    );
-    const designerBalanceBefore = await ethers.provider.getBalance(
-      designer.address,
-    );
-    expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(
-      totalContractBalance,
-    );
+    const creatorBalanceBefore = await ethers.provider.getBalance(creator.address);
+    const developerBalanceBefore = await ethers.provider.getBalance(developer.address);
+    const designerBalanceBefore = await ethers.provider.getBalance(designer.address);
+    expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(totalContractBalance);
 
     await nftContract.connect(user1).withdraw();
 
     expect(await ethers.provider.getBalance(nftContract.address)).to.be.eq(0);
-    const creatorBalanceAfter = await ethers.provider.getBalance(
-      creator.address,
-    );
-    const developerBalanceAfter = await ethers.provider.getBalance(
-      developer.address,
-    );
-    const designerBalanceAfter = await ethers.provider.getBalance(
-      designer.address,
-    );
+    const creatorBalanceAfter = await ethers.provider.getBalance(creator.address);
+    const developerBalanceAfter = await ethers.provider.getBalance(developer.address);
+    const designerBalanceAfter = await ethers.provider.getBalance(designer.address);
 
-    expect(creatorBalanceAfter.sub(creatorBalanceBefore)).to.be.eq(
-      creatorBalanceAfterWithdraw,
-    );
+    expect(creatorBalanceAfter.sub(creatorBalanceBefore)).to.be.eq(creatorBalanceAfterWithdraw);
     expect(developerBalanceAfter.sub(developerBalanceBefore)).to.be.eq(
       developerBalanceAfterWithdraw,
     );
-    expect(designerBalanceAfter.sub(designerBalanceBefore)).to.be.eq(
-      designerBalanceAfterWithdraw,
-    );
+    expect(designerBalanceAfter.sub(designerBalanceBefore)).to.be.eq(designerBalanceAfterWithdraw);
 
     expect(
       creatorBalanceAfterWithdraw

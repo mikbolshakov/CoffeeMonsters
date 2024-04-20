@@ -24,12 +24,6 @@ const ConnectButton = () => {
     }
   };
 
-  // Network Name: zkSync Era Mainnet
-  // RPC URL: https://mainnet.era.zksync.io
-  // Chain ID: 324
-  // Currency Symbol: ETH
-  // Block Explorer URL: https://explorer.zksync.io/
-
   const connectMetamaskHandler = async () => {
     if (window.ethereum) {
       try {
@@ -101,7 +95,7 @@ const ConnectButton = () => {
         </button>
       ) : (
         <button className="connect-button" onClick={connectMetamaskHandler}>
-          Connect wallet
+          Connect MetaMask
         </button>
       )}
     </>
