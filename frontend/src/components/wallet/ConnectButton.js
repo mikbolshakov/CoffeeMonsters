@@ -42,11 +42,11 @@ const ConnectButton = () => {
           method: 'eth_chainId',
         });
 
-        if (currentChainId !== '0x13881') {
+        if (currentChainId !== '0x28c61') {
           try {
             await window.ethereum.request({
               method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x13881' }],
+              params: [{ chainId: '0x28c61' }],
             });
           } catch (switchError) {
             if (switchError.code === 4902) {
@@ -55,15 +55,15 @@ const ConnectButton = () => {
                   method: 'wallet_addEthereumChain',
                   params: [
                     {
-                      chainId: '0x13881',
-                      chainName: 'Mumbai Testnet',
-                      rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+                      chainId: '0x28c61',
+                      chainName: 'Taiko Hekla L2',
+                      rpcUrls: ['https://rpc.hekla.taiko.xyz'],
                       nativeCurrency: {
-                        name: 'MATIC',
-                        symbol: 'MATIC',
+                        name: 'ETH',
+                        symbol: 'ETH',
                         decimals: 18,
                       },
-                      blockExplorerUrls: ['https://polygonscan.com/'],
+                      blockExplorerUrls: ['https://hekla.taikoscan.network'],
                     },
                   ],
                 });

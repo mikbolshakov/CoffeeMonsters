@@ -1,15 +1,25 @@
 import { useState, useEffect } from 'react';
 import MonsterBox from '../../images/MonsterBox.svg';
 import contractAbi from '../../ABI/coffeeMonstersAbi.json';
+import testnetContractAbi from '../../ABI/testnetCoffeeMonstersAbi.json';
 import { ethers } from 'ethers';
 import './MintParagraph.css';
 
-const mintPrice = 0.00666;
-const halfMintPrice = 0.00333;
-const contractAddress = '0x5e421Fe3D2066Af572bc2F04839729869b6354a9';
+const mintPrice = process.env.REACT_APP_MINT_PRICE;
+const halfMintPrice = process.env.REACT_APP_HALF_MINT_PRICE;
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const contract = new ethers.Contract(contractAddress, contractAbi, provider);
+const getContract = () => {
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(
+    contractAddress,
+    testnetContractAbi,
+    signer,
+  );
+
+  return contract;
+};
 
 const MintParagraph = () => {
   const [selectedOption, setSelectedOption] = useState('public');
@@ -48,6 +58,8 @@ const MintParagraph = () => {
 
   const handleMint = async (e) => {
     e.preventDefault();
+    const contract = getContract();
+
     if (nftCount === 0) {
       alert('Add some NFTs');
       return;
@@ -86,10 +98,23 @@ const MintParagraph = () => {
     setNftCount(0);
   };
 
+  const handleTestnetMint = async () => {
+    const contract = getContract();
+
+    try {
+      const tx = await contract.safeMint();
+      await tx.wait();
+      alert('Successfuly minted!');
+    } catch (error) {
+      alert('Blockchin side error');
+      console.error(error);
+    }
+  };
+
   return (
     <div className="mint-container">
       <h1>Mint NFT</h1>
-      <div className="options-container">
+      {/*<div className="options-container">
         <div className={'option'} onClick={() => handleOptionChange('public')}>
           Public Mint
         </div>
@@ -104,12 +129,12 @@ const MintParagraph = () => {
           </div>
         </div>
         <div className={`underline ${selectedOption}`} />
-      </div>
+      </div>*/}
 
       <div className="mint-details-container">
         <img src={MonsterBox} alt="Monster" className="monster-box" />
 
-        <div>
+        {/* <div>
           <div className="detail-column">
             <div className="detail-row">
               <p>Number</p>
@@ -125,12 +150,11 @@ const MintParagraph = () => {
             <p>Total price</p>
             <p>{price}</p>
           </div>
-        </div>
+        </div> */}
       </div>
-      <button className="mint-now-button">
-        {/* onClick={handleMint} */}
-        Comming soon...
-        {/* Mint Now */}
+      <button className="mint-now-button" onClick={handleTestnetMint}>
+        {/* Comming soon... */}
+        Mint Now
       </button>
     </div>
   );
