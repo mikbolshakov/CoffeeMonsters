@@ -18,6 +18,7 @@ const getContract = () => {
       testnetContractAbi,
       signer,
     );
+
     return contract;
   } catch (error) {
     console.log(error.message);
@@ -30,6 +31,7 @@ const MintParagraph = () => {
   const [price, setPrice] = useState();
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setNftCount(0);
@@ -64,12 +66,7 @@ const MintParagraph = () => {
   const connectMetamaskHandler = async () => {
     if (window.ethereum) {
       try {
-        await window.ethereum
-          .request({ method: 'eth_requestAccounts' })
-          .then((res) => {
-            console.log(res);
-            return res;
-          });
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const currentChainId = await window.ethereum.request({
           method: 'eth_chainId',
@@ -102,19 +99,22 @@ const MintParagraph = () => {
                 });
               } catch (addError) {
                 console.log(addError);
-                return;
+                return false;
               }
             } else {
               console.log(switchError);
-              return;
+              return false;
             }
           }
         }
+        return true;
       } catch (error) {
         console.log(error);
+        return false;
       }
     } else {
       alert('Install MetaMask extension!');
+      return false;
     }
   };
 
@@ -161,22 +161,25 @@ const MintParagraph = () => {
   };
 
   const handleTestnetMint = async () => {
-    // try {
-    await connectMetamaskHandler();
-    // } catch (error) {
-    //   return;
-    // }
+    const isConnected = await connectMetamaskHandler();
+
+    if (!isConnected) {
+      return;
+    }
 
     const contract = getContract();
 
     try {
+      setLoading(true);
       const tx = await contract.safeMint();
-
       await tx.wait();
+
       setSuccessModalOpen(true);
     } catch (error) {
-      setErrorModalOpen(true);
       console.error(error);
+      setErrorModalOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -230,6 +233,13 @@ const MintParagraph = () => {
         {/* Comming soon... */}
         Mint Now
       </button>
+
+      {loading && (
+        <div className="loader-overlay">
+          <p className="loading-text">Waiting for transaction...</p>
+          <div className="loader"></div>
+        </div>
+      )}
 
       {successModalOpen && (
         <div className="modal">
