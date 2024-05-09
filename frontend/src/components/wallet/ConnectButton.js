@@ -83,7 +83,7 @@ const ConnectButton = () => {
         console.log(error);
       }
     } else {
-      alert('install metamask extension!!');
+      alert('Install MetaMask extension!');
     }
   };
 

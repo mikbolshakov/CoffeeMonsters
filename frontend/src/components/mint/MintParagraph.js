@@ -9,22 +9,27 @@ const mintPrice = process.env.REACT_APP_MINT_PRICE;
 const halfMintPrice = process.env.REACT_APP_HALF_MINT_PRICE;
 
 const getContract = () => {
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(
-    contractAddress,
-    testnetContractAbi,
-    signer,
-  );
-
-  return contract;
+  try {
+    const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(
+      contractAddress,
+      testnetContractAbi,
+      signer,
+    );
+    return contract;
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 const MintParagraph = () => {
   const [selectedOption, setSelectedOption] = useState('public');
   const [nftCount, setNftCount] = useState();
   const [price, setPrice] = useState();
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
 
   useEffect(() => {
     setNftCount(0);
@@ -53,6 +58,63 @@ const MintParagraph = () => {
   const handleIncreaseNftCount = () => {
     if (nftCount < 100) {
       setNftCount(nftCount + 1);
+    }
+  };
+
+  const connectMetamaskHandler = async () => {
+    if (window.ethereum) {
+      try {
+        await window.ethereum
+          .request({ method: 'eth_requestAccounts' })
+          .then((res) => {
+            console.log(res);
+            return res;
+          });
+
+        const currentChainId = await window.ethereum.request({
+          method: 'eth_chainId',
+        });
+
+        if (currentChainId !== '0x28c61') {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x28c61' }],
+            });
+          } catch (switchError) {
+            if (switchError.code === 4902) {
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [
+                    {
+                      chainId: '0x28c61',
+                      chainName: 'Taiko Hekla L2',
+                      rpcUrls: ['https://rpc.hekla.taiko.xyz'],
+                      nativeCurrency: {
+                        name: 'ETH',
+                        symbol: 'ETH',
+                        decimals: 18,
+                      },
+                      blockExplorerUrls: ['https://hekla.taikoscan.network'],
+                    },
+                  ],
+                });
+              } catch (addError) {
+                console.log(addError);
+                return;
+              }
+            } else {
+              console.log(switchError);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      alert('Install MetaMask extension!');
     }
   };
 
@@ -99,16 +161,28 @@ const MintParagraph = () => {
   };
 
   const handleTestnetMint = async () => {
+    // try {
+    await connectMetamaskHandler();
+    // } catch (error) {
+    //   return;
+    // }
+
     const contract = getContract();
 
     try {
       const tx = await contract.safeMint();
+
       await tx.wait();
-      alert('Successfuly minted!');
+      setSuccessModalOpen(true);
     } catch (error) {
-      alert('Blockchin side error');
+      setErrorModalOpen(true);
       console.error(error);
     }
+  };
+
+  const closeModal = () => {
+    setSuccessModalOpen(false);
+    setErrorModalOpen(false);
   };
 
   return (
@@ -156,6 +230,26 @@ const MintParagraph = () => {
         {/* Comming soon... */}
         Mint Now
       </button>
+
+      {successModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Roar!</h2>
+            <p>Successfully minted!</p>
+            <button onClick={closeModal}>OK</button>
+          </div>
+        </div>
+      )}
+
+      {errorModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Oh no!</h2>
+            <p>Blockchain side error</p>
+            <button onClick={closeModal}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
