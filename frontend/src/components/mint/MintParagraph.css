@@ -167,9 +167,6 @@
   padding: 20px;
   border-radius: 18px;
   text-align: center;
-}
-
-.modal-content {
   border: 2px solid rgba(105, 171, 167, 1);
   color: rgba(105, 171, 167, 1);
 }
@@ -219,5 +216,10 @@
   .mint-now-button {
     width: 200px;
     font-size: 22px;
+  }
+
+  .modal-content {
+    width: 230px;
+    height: 180px;
   }
 }
