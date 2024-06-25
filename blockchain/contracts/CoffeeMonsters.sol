@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
+    using Strings for uint256;
     uint256 private _nextTokenId;
 
     address immutable creatorAddress;
@@ -16,26 +17,39 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
     uint256 public constant MAX_TOKENS = 666;
     uint256 public constant MINT_PRICE = 0.00666 ether;
     uint256 public constant PARTNERS_MINT_PRICE = 0.00333 ether;
+    string baseURI;
+    string baseExtension = ".json";
 
     constructor(
         address _creator,
         address _developer,
-        address _designer
+        address _designer,
+        address _royaltyReceiver,
+        uint96 _feeNumerator,
+        address[] memory _freeMintReceivers
     ) ERC721("CoffeeMonsters", "CM") Ownable(_developer) {
+        _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
         creatorAddress = _creator;
         developerAddress = _developer;
         designerAddress = _designer;
+        freeMint(_freeMintReceivers);
     }
 
-    function setRoyalty(
-        address _royaltyReceiver,
-        uint96 _feeNumerator
-    ) external onlyOwner {
-        _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
+    /// @notice Set the base URI for all token IDs.
+    /// @param _newuri The new base URI.
+    function setURI(string memory _newuri) external onlyOwner {
+        baseURI = _newuri;
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://qqq/";
+    /// @notice Get the URI of a token.
+    /// @param _tokenId ID of the token.
+    /// @return URI of the token.
+    function tokenURI(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
+        string memory base = baseURI;
+        string memory extension = baseExtension;
+        return string(abi.encodePacked(base, _tokenId.toString(), extension));
     }
 
     function safeMint(uint256 _amount) external payable {
@@ -58,6 +72,15 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
         for (uint256 i = 0; i < _amount; i++) {
             uint256 tokenId = _nextTokenId++;
             _safeMint(msg.sender, tokenId);
+        }
+    }
+
+    function freeMint(address[] memory _receivers) private {
+        uint256 addressesNumber = _receivers.length;
+
+        for (uint256 i = 0; i < addressesNumber; i++) {
+            uint256 tokenId = _nextTokenId++;
+            _safeMint(_receivers[i], tokenId);
         }
     }
 

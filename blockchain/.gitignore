@@ -1,5 +1,8 @@
 /node_modules
-/1_666
+/1_images
+/1_jsons
+/metadata
+/WL
 .env
 .DS_Store
 notes.md

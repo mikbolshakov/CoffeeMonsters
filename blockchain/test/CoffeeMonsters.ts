@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { CoffeeMonsters } from '../typechain-types';
+import { freeMintAddresses } from '../WL/freeMint';
 
 describe('CoffeeMonsters tests', async () => {
   let nftContract: CoffeeMonsters;
@@ -13,6 +14,8 @@ describe('CoffeeMonsters tests', async () => {
   let user2: SignerWithAddress;
   let user3: SignerWithAddress;
   let user4: SignerWithAddress;
+
+  const freeMintAmount = 84;
   before(async () => {
     signers = await ethers.getSigners();
     creator = signers[0];
@@ -26,21 +29,23 @@ describe('CoffeeMonsters tests', async () => {
 
   it('Deploy contract', async () => {
     const Factory = await ethers.getContractFactory('CoffeeMonsters');
-    const monsters = await Factory.deploy(creator.address, developer.address, designer.address);
+    const monsters = await Factory.deploy(
+      creator.address,
+      developer.address,
+      designer.address,
+      creator.address,
+      1000,
+      freeMintAddresses,
+    );
 
     expect(monsters.address).to.not.eq(ethers.constants.AddressZero);
     nftContract = monsters as CoffeeMonsters;
   });
 
-  it('Set default royalty', async () => {
-    expect(nftContract.setRoyalty(nftContract.address, 1000)).to.be.revertedWithCustomError; // only owner
-    await nftContract.connect(developer).setRoyalty(nftContract.address, 1000);
-  });
-
   it('Mint some tokens', async () => {
     const amount = 1;
 
-    expect(await nftContract.totalSupply()).to.be.eq(0);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount);
     expect(await nftContract.balanceOf(user1.address)).to.be.eq(0);
 
     // safeMint()
@@ -48,7 +53,7 @@ describe('CoffeeMonsters tests', async () => {
       value: ethers.utils.parseEther('0.00666'),
     });
 
-    expect(await nftContract.totalSupply()).to.be.eq(amount);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + amount);
     expect(await nftContract.balanceOf(user1.address)).to.be.eq(amount);
 
     // Check: Tx value below price
@@ -63,8 +68,17 @@ describe('CoffeeMonsters tests', async () => {
       value: ethers.utils.parseEther('0.00834'),
     });
 
-    expect(await nftContract.totalSupply()).to.be.eq(amount * 2);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + amount * 2);
     expect(await nftContract.balanceOf(user1.address)).to.be.eq(amount * 2);
+  });
+
+  it('Set URI', async () => {
+    expect(nftContract.connect(user1).setURI('ipfs://qqq/')).to.be.revertedWithCustomError; // onlyOwner
+
+    await nftContract.connect(developer).setURI('ipfs://qqq/');
+
+    expect(await nftContract.tokenURI(0)).to.be.eq('ipfs://qqq/0.json');
+    expect(await nftContract.tokenURI(1)).to.be.eq('ipfs://qqq/1.json');
   });
 
   it('Check NFT contract data', async () => {
@@ -73,10 +87,6 @@ describe('CoffeeMonsters tests', async () => {
 
     const erc721 = '0x80ac58cd';
     expect(await nftContract.supportsInterface(erc721)).to.equal(true);
-
-    expect(await nftContract.tokenURI(0)).to.be.eq('ipfs://qqq/0');
-    expect(await nftContract.tokenURI(1)).to.be.eq('ipfs://qqq/1');
-    await expect(nftContract.tokenURI(2)).to.be.reverted;
   });
 
   it('Withdraw Eth from the contract', async () => {
@@ -114,42 +124,42 @@ describe('CoffeeMonsters tests', async () => {
   });
 
   it('Mint some tokens', async () => {
-    const amount = 200;
-    expect(await nftContract.totalSupply()).to.be.eq(2);
+    const amount = 100;
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + 2);
     expect(await nftContract.balanceOf(user2.address)).to.be.eq(0);
 
     await nftContract.connect(user2).safeMint(amount, {
       value: ethers.utils.parseEther('0.00666').mul(amount),
     });
 
-    expect(await nftContract.totalSupply()).to.be.eq(amount + 2);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + amount + 2);
     expect(await nftContract.balanceOf(user2.address)).to.be.eq(amount);
 
     await nftContract.connect(user4).safeMint(amount, {
       value: ethers.utils.parseEther('0.00666').mul(amount),
     });
 
-    expect(await nftContract.totalSupply()).to.be.eq(402);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + 202);
     expect(await nftContract.balanceOf(user4.address)).to.be.eq(amount);
 
     await expect(
-      nftContract.connect(user3).safeMint(amount * 2, {
-        value: ethers.utils.parseEther('0.00666').mul(amount * 2),
+      nftContract.connect(user3).safeMint(amount * 30, {
+        value: ethers.utils.parseEther('0.00666').mul(amount * 30),
       }),
     ).to.be.revertedWith('Max collection limit!');
     await nftContract.connect(user3).safeMint(amount, {
       value: ethers.utils.parseEther('0.006668263461').mul(amount),
     });
 
-    expect(await nftContract.totalSupply()).to.be.eq(602);
+    expect(await nftContract.totalSupply()).to.be.eq(freeMintAmount + 302);
     expect(await nftContract.balanceOf(user3.address)).to.be.eq(amount);
   });
 
   it('Withdraw Eth from the contract', async () => {
-    const totalContractBalance = ethers.utils.parseEther('3.9976526922');
-    const creatorBalanceAfterWithdraw = ethers.utils.parseEther('1.3352159991948');
-    const developerBalanceAfterWithdraw = ethers.utils.parseEther('1.3312183465026');
-    const designerBalanceAfterWithdraw = ethers.utils.parseEther('1.3312183465026');
+    const totalContractBalance = ethers.utils.parseEther('1.9988263461');
+    const creatorBalanceAfterWithdraw = ethers.utils.parseEther('0.6676079995974');
+    const developerBalanceAfterWithdraw = ethers.utils.parseEther('0.6656091732513');
+    const designerBalanceAfterWithdraw = ethers.utils.parseEther('0.6656091732513');
 
     const creatorBalanceBefore = await ethers.provider.getBalance(creator.address);
     const developerBalanceBefore = await ethers.provider.getBalance(developer.address);
