@@ -31,6 +31,7 @@ const MintParagraph = () => {
   const [price, setPrice] = useState();
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [addNftsModalOpen, setAddNftsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -120,25 +121,35 @@ const MintParagraph = () => {
 
   const handleMint = async (e) => {
     e.preventDefault();
+
+    const isConnected = await connectMetamaskHandler();
+
+    if (!isConnected) {
+      return;
+    }
+
     const contract = getContract();
 
     if (nftCount === 0) {
-      alert('Add some NFTs');
+      setAddNftsModalOpen(true);
       return;
     }
+
     if (selectedOption === 'half') {
       try {
         const value = ethers.utils.parseEther(
           (halfMintPrice * nftCount).toString(),
         );
+
+        setLoading(true);
         const tx = await contract.publicMint(nftCount, false, {
           value: value,
         });
         await tx.wait();
 
-        alert('Successfuly minted!');
+        setSuccessModalOpen(true);
       } catch (error) {
-        alert('Blockchin side error');
+        setErrorModalOpen(true);
         console.error(error);
       }
     } else {
@@ -146,17 +157,21 @@ const MintParagraph = () => {
         const value = ethers.utils.parseEther(
           (mintPrice * nftCount).toString(),
         );
+
+        setLoading(true);
         const tx = await contract.publicMint(nftCount, false, {
           value: value,
         });
         await tx.wait();
-        alert('Successfuly minted!');
+
+        setSuccessModalOpen(true);
       } catch (error) {
-        alert('Blockchin side error');
+        setErrorModalOpen(true);
         console.error(error);
       }
     }
 
+    setLoading(false);
     setNftCount(0);
   };
 
@@ -191,7 +206,7 @@ const MintParagraph = () => {
   return (
     <div className="mint-container">
       <h1>Mint NFT</h1>
-      {/*<div className="options-container">
+      <div className="options-container">
         <div className={'option'} onClick={() => handleOptionChange('public')}>
           Public Mint
         </div>
@@ -206,12 +221,12 @@ const MintParagraph = () => {
           </div>
         </div>
         <div className={`underline ${selectedOption}`} />
-      </div>*/}
+      </div>
 
       <div className="mint-details-container">
         <img src={MonsterBox} alt="Monster" className="monster-box" />
 
-        {/* <div>
+        <div>
           <div className="detail-column">
             <div className="detail-row">
               <p>Number</p>
@@ -227,7 +242,7 @@ const MintParagraph = () => {
             <p>Total price</p>
             <p>{price}</p>
           </div>
-        </div> */}
+        </div>
       </div>
       <button className="mint-now-button" onClick={handleTestnetMint}>
         {/* Comming soon... */}
@@ -256,6 +271,16 @@ const MintParagraph = () => {
           <div className="modal-content">
             <h2>Oh no!</h2>
             <p>Blockchain side error</p>
+            <button onClick={closeModal}>OK</button>
+          </div>
+        </div>
+      )}
+
+      {addNftsModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Oh no!</h2>
+            <p>Add some NFTs</p>
             <button onClick={closeModal}>OK</button>
           </div>
         </div>

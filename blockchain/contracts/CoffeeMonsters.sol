@@ -17,6 +17,7 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
     uint256 public constant MAX_TOKENS = 666;
     uint256 public constant MINT_PRICE = 0.00666 ether;
     uint256 public constant PARTNERS_MINT_PRICE = 0.00333 ether;
+    mapping(address => bool) public hasFiftyPercents;
     string baseURI;
     string baseExtension = ".json";
 
@@ -26,13 +27,15 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
         address _designer,
         address _royaltyReceiver,
         uint96 _feeNumerator,
-        address[] memory _freeMintReceivers
+        address[] memory _freeMintReceivers,
+        address[] memory _fiftyPercentsReceivers
     ) ERC721("CoffeeMonsters", "CM") Ownable(_developer) {
         _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
         creatorAddress = _creator;
         developerAddress = _developer;
         designerAddress = _designer;
         freeMint(_freeMintReceivers);
+        addFiftyPercents(_fiftyPercentsReceivers);
     }
 
     /// @notice Set the base URI for all token IDs.
@@ -62,17 +65,29 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
         }
     }
 
-    function safeMintForPartners(uint256 _amount) external payable {
-        require(totalSupply() + _amount <= MAX_TOKENS, "Max collection limit!");
-        require(
-            msg.value >= (PARTNERS_MINT_PRICE * _amount),
-            "Tx value below price"
-        );
+    function safeMintForPartners() external payable {
+        require(hasFiftyPercents[msg.sender] == true, "Not a partner");
+        require(totalSupply() < MAX_TOKENS, "Max collection limit!");
+        require(msg.value >= PARTNERS_MINT_PRICE, "Tx value below price");
 
-        for (uint256 i = 0; i < _amount; i++) {
-            uint256 tokenId = _nextTokenId++;
-            _safeMint(msg.sender, tokenId);
-        }
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(msg.sender, tokenId);
+
+        hasFiftyPercents[msg.sender] = false;
+    }
+
+    function withdraw() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "Zero balance");
+
+        _widthdraw(developerAddress, (balance * 333) / 1000);
+        _widthdraw(designerAddress, (balance * 333) / 1000);
+        _widthdraw(creatorAddress, address(this).balance);
+    }
+
+    function _widthdraw(address _address, uint256 _amount) private {
+        (bool success, ) = _address.call{ value: _amount }("");
+        require(success, "Transfer failed.");
     }
 
     function freeMint(address[] memory _receivers) private {
@@ -84,17 +99,12 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
         }
     }
 
-    function withdraw() external {
-        uint256 balance = address(this).balance;
-        require(balance > 0, "Zero balance");
-        _widthdraw(developerAddress, (balance * 333) / 1000);
-        _widthdraw(designerAddress, (balance * 333) / 1000);
-        _widthdraw(creatorAddress, address(this).balance);
-    }
+    function addFiftyPercents(address[] memory _receivers) private {
+        uint256 addressesNumber = _receivers.length;
 
-    function _widthdraw(address _address, uint256 _amount) private {
-        (bool success, ) = _address.call{ value: _amount }("");
-        require(success, "Transfer failed.");
+        for (uint256 i = 0; i < addressesNumber; i++) {
+            hasFiftyPercents[_receivers[i]] = true;
+        }
     }
 
     // The following functions are overrides required by Solidity.

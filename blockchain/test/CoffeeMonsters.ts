@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { CoffeeMonsters } from '../typechain-types';
 import { freeMintAddresses } from '../WL/freeMint';
+import { fiftyPercents } from '../WL/fiftyPercents';
 
 describe('CoffeeMonsters tests', async () => {
   let nftContract: CoffeeMonsters;
@@ -36,6 +37,7 @@ describe('CoffeeMonsters tests', async () => {
       creator.address,
       1000,
       freeMintAddresses,
+      fiftyPercents,
     );
 
     expect(monsters.address).to.not.eq(ethers.constants.AddressZero);

@@ -16,11 +16,16 @@ const config: HardhatUserConfig = {
       url: process.env.TAIKO_HEKLA as string,
       accounts: [process.env.TAIKO_PRIVATE_KEY as string],
     },
+    base_mainnet: {
+      url: process.env.BASE_MAINNET as string,
+      accounts: [process.env.USER_PRIVATE_KEY as string],
+    },
   },
   etherscan: {
     apiKey: {
       taiko_hekla: 'taiko_hekla',
-      //   linea_goerli: process.env.LINEASCAN_API_KEY as string,
+      linea_goerli: process.env.LINEASCAN_API_KEY as string,
+      base_mainnet: process.env.BASESCAN_API_KEY as string,
     },
     customChains: [
       {
@@ -38,6 +43,14 @@ const config: HardhatUserConfig = {
           apiURL:
             'https://api.routescan.io/v2/network/testnet/evm/167009/etherscan',
           browserURL: 'https://hekla.taikoscan.network',
+        },
+      },
+      {
+        network: 'base_mainnet',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.com/api',
+          browserURL: 'https://basescan.build',
         },
       },
     ],

@@ -1,12 +1,14 @@
 import { ethers } from 'hardhat';
 import hre from 'hardhat';
+import { freeMintAddresses } from '../WL/freeMint';
+import { fiftyPercents } from '../WL/fiftyPercents';
 
 // npx hardhat run deploy/CoffeeMonsters.ts --network linea_goerli
 async function main() {
-  const _creator = '0x6ae19a226A6Cec3E29D5dfC90C2bd6640d8d77b9';
-  const _developer = '0x6ae19a226A6Cec3E29D5dfC90C2bd6640d8d77b9';
-  const _designer = '0x6ae19a226A6Cec3E29D5dfC90C2bd6640d8d77b9';
-  const _royaltyReceiver = '0x6ae19a226A6Cec3E29D5dfC90C2bd6640d8d77b9';
+  const _creator = '0x47d65daA4a24b60262eb3DE244f934D535776f22';
+  const _developer = '0xcb0e044384Bd09f194bb82A5A7eF32C30a3d4277';
+  const _designer = '0xe1b3c92c1c83e7e2ccc946fe926045c932c67d5e';
+  const _royaltyReceiver = '0x1Cabc0d944b3dCCdcb6b3829A602b5ca40085f90';
   const _feeNumerator = 1000;
 
   const coffee = await ethers.getContractFactory('CoffeeMonsters');
@@ -16,6 +18,8 @@ async function main() {
     _designer,
     _royaltyReceiver,
     _feeNumerator,
+    freeMintAddresses,
+    fiftyPercents,
   );
 
   await monsters.deployed();
@@ -31,6 +35,8 @@ async function main() {
       _designer,
       _royaltyReceiver,
       _feeNumerator,
+      freeMintAddresses,
+      fiftyPercents,
     ],
     contract: 'contracts/CoffeeMonsters.sol:CoffeeMonsters',
   });

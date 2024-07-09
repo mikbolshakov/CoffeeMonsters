@@ -24,7 +24,7 @@ async function uploadImage(filePath: string): Promise<string> {
 }
 
 async function updateJsonFiles() {
-  for (let i = 0; i < 666; i++) {
+  for (let i = 595; i < 666; i++) {
     const imageFileName = `${i + 1}.png`;
     const jsonFileName = `${i}.json`;
 
