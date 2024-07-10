@@ -5,7 +5,7 @@ import { partnerAddresses } from '../WL/partnerAddresses';
 config();
 
 // npx ts-node scripts/3_addPartners.ts
-const contractAddress = '';
+const contractAddress = '0xDaf131eb30748F4E204D42537E54E4C0B305F0D4';
 const provider = new ethers.providers.JsonRpcProvider(process.env.BASE_MAINNET);
 const contract = new ethers.Contract(contractAddress, contractAbi, provider);
 
@@ -24,4 +24,4 @@ export async function addPartners(admin: any, contract: ethers.Contract) {
   }
 }
 
-// addPartners(admin, contract);
+addPartners(admin, contract);

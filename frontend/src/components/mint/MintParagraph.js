@@ -82,11 +82,11 @@ const MintParagraph = () => {
           method: 'eth_chainId',
         });
 
-        if (currentChainId !== '0x28c61') {
+        if (currentChainId !== '0x2105') {
           try {
             await window.ethereum.request({
               method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x28c61' }],
+              params: [{ chainId: '0x2105' }],
             });
           } catch (switchError) {
             if (switchError.code === 4902) {
@@ -95,15 +95,15 @@ const MintParagraph = () => {
                   method: 'wallet_addEthereumChain',
                   params: [
                     {
-                      chainId: '0x28c61',
-                      chainName: 'Taiko Hekla L2',
-                      rpcUrls: ['https://rpc.hekla.taiko.xyz'],
+                      chainId: '0x2105',
+                      chainName: 'Base Mainnet',
+                      rpcUrls: ['https://mainnet.base.org'],
                       nativeCurrency: {
                         name: 'ETH',
                         symbol: 'ETH',
                         decimals: 18,
                       },
-                      blockExplorerUrls: ['https://hekla.taikoscan.network'],
+                      blockExplorerUrls: ['https://basescan.org'],
                     },
                   ],
                 });
@@ -194,8 +194,7 @@ const MintParagraph = () => {
           <div className="info-button">
             ?
             <span className="info-text">
-              Users with NFTs from the following collections (Proof of Narnian,
-              LobsterDao, DegenScore, Harma) enjoy a 50% minting price. Only for
+              Users with CoffeeMonsters poap enjoy a 50% minting price. Only for
               minting one NFT!
             </span>
           </div>
@@ -249,7 +248,7 @@ const MintParagraph = () => {
         <div className="modal">
           <div className="modal-content">
             <h2>Oh no!</h2>
-            <p>Blockchain side error</p>
+            <p>Check your MetaMask balance</p>
             <button onClick={closeModal}>OK</button>
           </div>
         </div>
@@ -259,7 +258,7 @@ const MintParagraph = () => {
         <div className="modal">
           <div className="modal-content">
             <h2>Oh no!</h2>
-            <p>Your address is not in the list of partners</p>
+            <p>Check the list of partners</p>
             <button onClick={closeModal}>OK</button>
           </div>
         </div>
