@@ -2,9 +2,34 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_developer",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_designer",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_royaltyReceiver",
+        "type": "address"
+      },
+      {
         "internalType": "uint96",
         "name": "_feeNumerator",
         "type": "uint96"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_partnerAddresses",
+        "type": "address[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -315,6 +340,45 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "MAX_TOKENS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MINT_PRICE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PARTNERS_MINT_PRICE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -392,6 +456,38 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isPartner",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -476,10 +572,23 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
     "name": "safeMint",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "safeMintForPartners",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -547,6 +656,19 @@
       }
     ],
     "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_newuri",
+        "type": "string"
+      }
+    ],
+    "name": "setURI",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -630,7 +752,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "_tokenId",
         "type": "uint256"
       }
     ],
@@ -642,7 +764,7 @@
         "type": "string"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -690,6 +812,13 @@
       }
     ],
     "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import MonsterBox from '../../images/MonsterBox.svg';
 import contractAbi from '../../ABI/coffeeMonstersAbi.json';
-import testnetContractAbi from '../../ABI/testnetCoffeeMonstersAbi.json';
 import { ethers } from 'ethers';
 import './MintParagraph.css';
 
@@ -13,11 +12,7 @@ const getContract = () => {
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      contractAddress,
-      testnetContractAbi,
-      signer,
-    );
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
 
     return contract;
   } catch (error) {
@@ -31,6 +26,7 @@ const MintParagraph = () => {
   const [price, setPrice] = useState();
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [notPartnerModalOpen, setNotPartnerModalOpen] = useState(false);
   const [addNftsModalOpen, setAddNftsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,9 +55,22 @@ const MintParagraph = () => {
   };
 
   const handleIncreaseNftCount = () => {
-    if (nftCount < 100) {
-      setNftCount(nftCount + 1);
+    if (selectedOption === 'half') {
+      if (nftCount === 0) {
+        setNftCount(nftCount + 1);
+      }
+    } else {
+      if (nftCount < 100) {
+        setNftCount(nftCount + 1);
+      }
     }
+  };
+
+  const closeModal = () => {
+    setSuccessModalOpen(false);
+    setErrorModalOpen(false);
+    setAddNftsModalOpen(false);
+    setNotPartnerModalOpen(false);
   };
 
   const connectMetamaskHandler = async () => {
@@ -137,19 +146,17 @@ const MintParagraph = () => {
 
     if (selectedOption === 'half') {
       try {
-        const value = ethers.utils.parseEther(
-          (halfMintPrice * nftCount).toString(),
-        );
+        const value = ethers.utils.parseEther(halfMintPrice.toString());
 
         setLoading(true);
-        const tx = await contract.publicMint(nftCount, false, {
+        const tx = await contract.safeMintForPartners({
           value: value,
         });
         await tx.wait();
 
         setSuccessModalOpen(true);
       } catch (error) {
-        setErrorModalOpen(true);
+        setNotPartnerModalOpen(true);
         console.error(error);
       }
     } else {
@@ -159,7 +166,7 @@ const MintParagraph = () => {
         );
 
         setLoading(true);
-        const tx = await contract.publicMint(nftCount, false, {
+        const tx = await contract.safeMint(nftCount, {
           value: value,
         });
         await tx.wait();
@@ -175,34 +182,6 @@ const MintParagraph = () => {
     setNftCount(0);
   };
 
-  const handleTestnetMint = async () => {
-    const isConnected = await connectMetamaskHandler();
-
-    if (!isConnected) {
-      return;
-    }
-
-    const contract = getContract();
-
-    try {
-      setLoading(true);
-      const tx = await contract.safeMint();
-      await tx.wait();
-
-      setSuccessModalOpen(true);
-    } catch (error) {
-      console.error(error);
-      setErrorModalOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const closeModal = () => {
-    setSuccessModalOpen(false);
-    setErrorModalOpen(false);
-  };
-
   return (
     <div className="mint-container">
       <h1>Mint NFT</h1>
@@ -216,7 +195,8 @@ const MintParagraph = () => {
             ?
             <span className="info-text">
               Users with NFTs from the following collections (Proof of Narnian,
-              LobsterDao, DegenScore, Harma) enjoy a 50% minting price.
+              LobsterDao, DegenScore, Harma) enjoy a 50% minting price. Only for
+              minting one NFT!
             </span>
           </div>
         </div>
@@ -244,8 +224,7 @@ const MintParagraph = () => {
           </div>
         </div>
       </div>
-      <button className="mint-now-button" onClick={handleTestnetMint}>
-        {/* Comming soon... */}
+      <button className="mint-now-button" onClick={handleMint}>
         Mint Now
       </button>
 
@@ -271,6 +250,16 @@ const MintParagraph = () => {
           <div className="modal-content">
             <h2>Oh no!</h2>
             <p>Blockchain side error</p>
+            <button onClick={closeModal}>OK</button>
+          </div>
+        </div>
+      )}
+
+      {notPartnerModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Oh no!</h2>
+            <p>Your address is not in the list of partners</p>
             <button onClick={closeModal}>OK</button>
           </div>
         </div>

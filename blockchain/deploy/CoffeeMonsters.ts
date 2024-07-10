@@ -1,9 +1,8 @@
 import { ethers } from 'hardhat';
 import hre from 'hardhat';
-import { freeMintAddresses } from '../WL/freeMint';
-import { fiftyPercents } from '../WL/fiftyPercents';
+import { partnerAddresses } from '../WL/partnerAddresses';
 
-// npx hardhat run deploy/CoffeeMonsters.ts --network linea_goerli
+// npx hardhat run deploy/CoffeeMonsters.ts --network base_mainnet
 async function main() {
   const _creator = '0x47d65daA4a24b60262eb3DE244f934D535776f22';
   const _developer = '0xcb0e044384Bd09f194bb82A5A7eF32C30a3d4277';
@@ -18,8 +17,7 @@ async function main() {
     _designer,
     _royaltyReceiver,
     _feeNumerator,
-    freeMintAddresses,
-    fiftyPercents,
+    partnerAddresses,
   );
 
   await monsters.deployed();
@@ -35,8 +33,7 @@ async function main() {
       _designer,
       _royaltyReceiver,
       _feeNumerator,
-      freeMintAddresses,
-      fiftyPercents,
+      partnerAddresses,
     ],
     contract: 'contracts/CoffeeMonsters.sol:CoffeeMonsters',
   });
