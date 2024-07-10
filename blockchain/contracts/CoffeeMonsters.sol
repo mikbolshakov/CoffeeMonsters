@@ -30,20 +30,17 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
     /// @param _designer Address of the NFT collection designer.
     /// @param _royaltyReceiver Address to receive royalty payments.
     /// @param _feeNumerator Numerator of the royalty fee.
-    /// @param _partnerAddresses Addresses eligible for partner minting.
     constructor(
         address _creator,
         address _developer,
         address _designer,
         address _royaltyReceiver,
-        uint96 _feeNumerator,
-        address[] memory _partnerAddresses
+        uint96 _feeNumerator
     ) ERC721("CoffeeMonsters", "CM") Ownable(_developer) {
         _setDefaultRoyalty(_royaltyReceiver, _feeNumerator);
         creatorAddress = _creator;
         developerAddress = _developer;
         designerAddress = _designer;
-        addPartners(_partnerAddresses);
     }
 
     /// @notice Set the base URI for all token IDs.
@@ -117,7 +114,7 @@ contract CoffeeMonsters is ERC721, ERC721Enumerable, ERC2981, Ownable {
 
     /// @notice Internal function to add partner addresses.
     /// @param _partners The addresses to add as partners.
-    function addPartners(address[] memory _partners) private {
+    function addPartners(address[] memory _partners) external onlyOwner {
         uint256 addressesNumber = _partners.length;
 
         for (uint256 i = 0; i < addressesNumber; i++) {

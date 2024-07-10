@@ -84,7 +84,6 @@ describe('CoffeeMonsters tests', async () => {
       designer.address,
       creator.address,
       1000,
-      partnerAddresses,
     );
 
     expect(monsters.address).to.not.eq(ethers.constants.AddressZero);

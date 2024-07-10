@@ -36,8 +36,8 @@ const config: HardhatUserConfig = {
         network: 'base_mainnet',
         chainId: 8453,
         urls: {
-          apiURL: 'https://api.basescan.com/api',
-          browserURL: 'https://basescan.build',
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
         },
       },
     ],

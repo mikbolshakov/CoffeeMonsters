@@ -1,6 +1,5 @@
 import { ethers } from 'hardhat';
 import hre from 'hardhat';
-import { partnerAddresses } from '../WL/partnerAddresses';
 
 // npx hardhat run deploy/CoffeeMonsters.ts --network base_mainnet
 async function main() {
@@ -8,7 +7,7 @@ async function main() {
   const _developer = '0xcb0e044384Bd09f194bb82A5A7eF32C30a3d4277';
   const _designer = '0xe1b3c92c1c83e7e2ccc946fe926045c932c67d5e';
   const _royaltyReceiver = '0x1Cabc0d944b3dCCdcb6b3829A602b5ca40085f90';
-  const _feeNumerator = 1000;
+  const _feeNumerator = 666;
 
   const coffee = await ethers.getContractFactory('CoffeeMonsters');
   const monsters = await coffee.deploy(
@@ -17,7 +16,6 @@ async function main() {
     _designer,
     _royaltyReceiver,
     _feeNumerator,
-    partnerAddresses,
   );
 
   await monsters.deployed();
@@ -33,7 +31,6 @@ async function main() {
       _designer,
       _royaltyReceiver,
       _feeNumerator,
-      partnerAddresses,
     ],
     contract: 'contracts/CoffeeMonsters.sol:CoffeeMonsters',
   });
